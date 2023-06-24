@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Ticket } from '../models';
+import { Customer, Movie, Ticket } from '../models';
 import { HttpResponse } from "../middlewares/http-handlers";
 import logger from "../utils/logger";
 import { CONSTANT } from "../utils/constant";
@@ -10,8 +10,38 @@ import { ITicketAttr } from "../models/Ticket";
 export const ticketController = {
     getAllTickets: async (req: Request, res: Response) => {
         try {
-            const response = await Ticket.findAll({});
-            logger.debug(response);
+            const response = await Ticket.findAll({
+                where: {},
+                include: [
+                    {
+                        model: Customer,
+                        as: "customerDetails",
+                        attributes: [
+                            "customerId",
+                            "firstName",
+                            "lastName",
+                            "age",
+                            "sex"
+                        ]
+                    },
+                    {
+                        model: Movie,
+                        as: "movieDetails",
+                        attributes: [
+                            "movieId",
+                            "movieTitle",
+                            "movieTime"
+                        ]
+                    }
+                ],
+                attributes: [
+                    "ticketId",
+                    "price",
+                    "location",
+                    "seatNum",
+                    "addOns",
+                ]
+            });
             return HttpResponse(res, { data: response });
         } catch (error) {
             res.json({
@@ -19,33 +49,28 @@ export const ticketController = {
             })
         }
     },
-    getTicketByPK: async (req: Request, res: Response) => {
+    updateTicketByPK: async (req: Request, res: Response) => {
         try {
-            switch (req.method) {
-                case CONSTANT.HTTP_METHODS.GET: {
-                    return HttpResponse(res, { message: `${req.method} by id` });
-                }
-                case CONSTANT.HTTP_METHODS.PUT: {
-                    return HttpResponse(res, { message: `${req.method} by id` });
-                }
-                case CONSTANT.HTTP_METHODS.DELETE: {
-                    return HttpResponse(res, { message: `${req.method} by id` });
-                }
-                default: {
-                    return HttpResponse(res, { message: `${req.method} by id` });
-                }
+            const { id } = req.params;
+            const ticket = await Ticket.findByPk(id);
+            if (ticket == null) return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No ticket found with id ${id}`, success: true });
+            ticket.set({
+                ...req.body
+            });
+            await ticket.save();
+            return HttpResponse(res, { data: { ...ticket.dataValues } })
+        } catch (error: any) {
+            logger.error(`Error while creating movie = ${error}`)
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-        } catch (error) {
-            logger.error(JSON.stringify(error));
-            res.json({
-                error: error
-            })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
         }
     },
     createTicket: async (req: Request, res: Response) => {
         try {
             let id = uuidv4();
-            let createTicketInstance:ITicketAttr = {
+            let createTicketInstance: ITicketAttr = {
                 ticketId: id,
                 price: req.body.price,
                 location: req.body.location,
@@ -63,6 +88,62 @@ export const ticketController = {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
             return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+        }
+    },
+    deleteTicketByPK: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const ticket = await Ticket.findByPk(id);
+            if (ticket == null) return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No ticket found with id ${id}`, success: true });
+            await ticket.destroy();
+            return HttpResponse(res, { data: {} })
+        } catch (error: any) {
+            logger.error(`Error while creating movie = ${error}`)
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
+            }
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+        }
+    },
+    getTicketByPK: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const ticketByPk = await Ticket.findByPk(id, {
+                include: [
+                    {
+                        model: Customer,
+                        as: "customerDetails",
+                        attributes: [
+                            "customerId",
+                            "firstName",
+                            "lastName",
+                            "age",
+                            "sex"
+                        ]
+                    },
+                    {
+                        model: Movie,
+                        as: "movieDetails",
+                        attributes: [
+                            "movieId",
+                            "movieTitle",
+                            "movieTime"
+                        ]
+                    }
+                ],
+                attributes: [
+                    "ticketId",
+                    "price",
+                    "location",
+                    "seatNum",
+                    "addOns",
+                ]
+            });
+            return HttpResponse(res, { data: ticketByPk });
+        } catch (error) {
+            res.json({
+                error: error
+            })
         }
     },
 }

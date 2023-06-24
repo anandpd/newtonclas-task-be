@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ticketController } from '../controllers';
 import { VerifyAuth } from '../middlewares/auth';
-import { ticketIdValidation, createTicketValidation } from '../validations/ticket';
+import { ticketIdValidation, ticketIdUpdateValidation, createTicketValidation } from '../validations/ticket';
 const router = Router();
 
 /**
@@ -18,12 +18,12 @@ router.post("/", createTicketValidation, ticketController.createTicket);
 /**
  * Update
  */
-// router.put("/:id", VerifyAuth, ticketIdValidation, ticketController.performCrud);
+router.put("/:id", VerifyAuth, ticketIdUpdateValidation, ticketController.updateTicketByPK);
 
 /**
  * Delete
  */
-// router.delete("/:id", VerifyAuth, ticketIdValidation, ticketController.performCrud);
+router.delete("/:id", VerifyAuth, ticketIdValidation, ticketController.deleteTicketByPK);
 
 
 export default router;

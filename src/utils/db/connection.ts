@@ -6,8 +6,8 @@ const sequelize = new Sequelize(CONSTANT.CONNECTION_STRING, { dialect: 'postgres
 (async () => {
     await sequelize.authenticate();
     logger.info(CONSTANT.LOGGING.DATABASE.SUCCESS);
-    await sequelize.sync({force: true});
-    logger.info(CONSTANT.LOGGING.DATABASE.SYNC);
+    // await sequelize.sync({force: true});
+    // logger.info(CONSTANT.LOGGING.DATABASE.SYNC);
 })()
 
 

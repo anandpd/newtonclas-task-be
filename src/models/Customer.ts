@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
+import { Ticket } from './Ticket';
 
 const model = {
     customerId: {
@@ -50,3 +51,6 @@ export const Customer = db.sequelize.define<CustomerInstance>(CONSTANT.MODELS.CU
     timestamps: true,
     freezeTableName: true
 });
+
+Customer.hasMany(Ticket, { foreignKey: "customerId", as: "ticketDetails" });
+Ticket.belongsTo(Customer, { foreignKey: "customerId", as: "customerDetails" });

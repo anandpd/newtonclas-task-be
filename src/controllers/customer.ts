@@ -29,9 +29,7 @@ export const customerController = {
         try {
             const { id } = req.params;
             const customer = await Customer.findByPk(id);
-            if (customer == null) {
-                return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
-            }
+            if (customer == null)  return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
             return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, data: customer, success: true });
         } catch (error: any) {
             if (error.name == "SequelizeValidationError") {

@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
+import { Movie } from './Movie';
 
 const model = {
     ticketId: {
@@ -59,3 +60,7 @@ export const Ticket = db.sequelize.define<TicketInstance>(CONSTANT.MODELS.TICKET
     freezeTableName: true
 });
 
+Movie.hasMany(Ticket, { foreignKey: 'movieId', as: "movieDetails" });
+Ticket.belongsTo(Movie, { foreignKey: 'movieId', as: "movieDetails" });
+// Customer.hasMany(Ticket, { foreignKey: "customerId", as: "ticketDetails" });
+// Ticket.belongsTo(Customer, { foreignKey: "customerId", as: "customerDetails" });
