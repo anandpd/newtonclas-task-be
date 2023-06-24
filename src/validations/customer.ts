@@ -25,7 +25,7 @@ export const createCustomerValidation = (req: Request, res: Response, next: Next
     }
     next();
 }
-export const customerIdValidation = (req: any, res: Response, next: NextFunction) => {
+export const customerIdUpdateValidation = (req: any, res: Response, next: NextFunction) => {
     const schemas = [
         {
             schema: joi.object({
@@ -57,5 +57,23 @@ export const customerIdValidation = (req: any, res: Response, next: NextFunction
             });
         }
     })
+    next();
+}
+
+export const customerIdValidation = (req: any, res: Response, next: NextFunction) => {
+    const data = req.params;
+    const schema = joi.object({
+        id: joi.string().guid() // 128 bit uuid
+    })
+
+    let { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
+    if (error) {
+        logger.error("Error while validating => ", error);
+        return HttpResponse(res, {
+            statusCode: CONSTANT.HTTP_STATUS.BAD_REQUEST,
+            message: error.message,
+            success: false
+        });
+    }
     next();
 }

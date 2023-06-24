@@ -46,4 +46,7 @@ interface CustomerInstance extends Model<ICustomerAttr, ICustomerCreateAttr> {
     createdAt?: Date;
     updateAt?: Date;
 }
-export const Customer = db.sequelize.define<CustomerInstance>(CONSTANT.MODELS.CUSTOMER, model);
+export const Customer = db.sequelize.define<CustomerInstance>(CONSTANT.MODELS.CUSTOMER, model, {
+    timestamps: true,
+    freezeTableName: true
+});

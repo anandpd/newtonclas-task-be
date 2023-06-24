@@ -1,24 +1,40 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
 
 
 const model = {
-    movie_id: {
+    movieId: {
         type: DataTypes.UUID,
         allowNull: false,
         unique: true,
         primaryKey: true
     },
-    movie_title: {
+    movieTitle: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
-    movie_time: {
-        type: DataTypes.FLOAT,
+    movieTime: {
+        type: DataTypes.INTEGER,
         allowNull: false
     }
 };
 
+export interface IMovieAttr {
+    movieId: string,
+    movieTitle: string,
+    movieTime: string
+}
 
-export const Movie = db.sequelize.define(CONSTANT.MODELS.MOVIE, model);
+export interface IMovieCreateAttr extends Optional<IMovieAttr, 'movieId'> { }
+
+interface MovieInstance extends Model<IMovieAttr, IMovieCreateAttr> {
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export const Movie = db.sequelize.define<MovieInstance>(CONSTANT.MODELS.MOVIE, model, {
+    timestamps: true,
+    freezeTableName: true
+});
