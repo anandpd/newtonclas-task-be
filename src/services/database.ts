@@ -1,5 +1,3 @@
-import { Model, ModelCtor } from 'sequelize';
-import * as Models from '../models';
 
 export const queryDB = {
     FindAll: async (modelName: any, attributes: any[]): Promise<any> => {

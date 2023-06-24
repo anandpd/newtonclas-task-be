@@ -1,9 +1,9 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
 
 const model = {
-    ticket_id: {
+    ticketId: {
         type: DataTypes.UUID,
         allowNull: false,
         unique: true,
@@ -17,25 +17,45 @@ const model = {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    seat_num: {
+    seatNum: {
         type: DataTypes.INTEGER,
         autoincrement: true,
         default: 100
     },
-    add_ons: {
+    addOns: {
         type: DataTypes.STRING,
         allowNull: true
     },
-    customer_id: {
-        type: DataTypes.STRING,
+    customerId: {
+        type: DataTypes.UUID,
         allowNull: false
     },
-    movie_id: {
-        type: DataTypes.STRING,
+    movieId: {
+        type: DataTypes.UUID,
         allowNull: false,
     }
 };
 
+export interface ITicketAttr {
+    ticketId: string,
+    price: number,
+    location: string,
+    seatNum: number,
+    addOns?: string,
+    customerId: string,
+    movieId: string
+}
 
-export const Ticket = db.sequelize.define(CONSTANT.MODELS.TICKET, model);
+export interface ITicketCreateAttr extends Optional<ITicketAttr, 'ticketId'> { }
+
+export interface TicketInstance extends Model<ITicketAttr, ITicketCreateAttr> {
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+
+export const Ticket = db.sequelize.define<TicketInstance>(CONSTANT.MODELS.TICKET, model, {
+    timestamps: true,
+    freezeTableName: true
+});
 
