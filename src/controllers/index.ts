@@ -1,0 +1,1 @@
+export { ticketController } from './ticket';

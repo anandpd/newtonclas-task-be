@@ -5,7 +5,7 @@ import db from '../utils/db/connection';
 
 const model = {
     movie_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         allowNull: false,
         unique: true,
         primaryKey: true

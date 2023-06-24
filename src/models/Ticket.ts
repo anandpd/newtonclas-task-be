@@ -1,10 +1,10 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
 
 const model = {
     ticket_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         allowNull: false,
         unique: true,
         primaryKey: true
@@ -12,6 +12,19 @@ const model = {
     price: {
         type: DataTypes.FLOAT,
         allowNull: false,
+    },
+    location: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    seat_num: {
+        type: DataTypes.INTEGER,
+        autoincrement: true,
+        default: 100
+    },
+    add_ons: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     customer_id: {
         type: DataTypes.STRING,

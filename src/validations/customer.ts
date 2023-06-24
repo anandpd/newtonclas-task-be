@@ -1,0 +1,43 @@
+import joi from 'joi';
+import logger from '../utils/logger';
+import { NextFunction, Request, Response } from 'express';
+import { HttpResponse } from '../middlewares/http-handlers';
+import { CONSTANT } from '../utils/constant';
+
+export const createCustomerValidation = (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body;
+    const schema = joi.object({
+        firstName: joi.string().required(),
+        lastName: joi.string().required(),
+        age: joi.number().integer().required(),
+        sex: joi.string().required().valid("M", "F", "O"),
+        address: joi.string().required()
+
+    });
+    const { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
+    if (error) {
+        logger.error("Error while validating => ", error);
+        return HttpResponse(res, {
+            statusCode: CONSTANT.HTTP_STATUS.BAD_REQUEST,
+            message: error.message,
+            success: false
+        });
+    }
+    next();
+}
+export const customerIdValidation = (req: Request, res: Response, next: NextFunction) => {
+    const data = req.params;
+    const schema = joi.object({
+        id: joi.string().guid() // 128 bit uuid
+    });
+    const { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
+    if (error) {
+        logger.error("Error while validating => ", error);
+        return HttpResponse(res, {
+            statusCode: CONSTANT.HTTP_STATUS.BAD_REQUEST,
+            message: error.message,
+            success: false
+        });
+    }
+    next();
+}

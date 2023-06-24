@@ -1,10 +1,10 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { CONSTANT } from '../utils/constant';
 import db from '../utils/db/connection';
 
 const model = {
-    customer_id: {
-        type: DataTypes.STRING,
+    customerId: {
+        type: DataTypes.UUID,
         allowNull: false,
         unique: true,
         primaryKey: true
@@ -25,8 +25,25 @@ const model = {
         type: DataTypes.STRING,
         allowNull: false
     },
+    address: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
 };
 
+export interface ICustomerAttr {
+    customerId: string,
+    firstName: string,
+    lastName: string,
+    age: number,
+    sex: string,
+    address: string
+}
 
+export interface ICustomerCreateAttr extends Optional<ICustomerAttr, 'customerId'> { }
 
-export const Customer = db.sequelize.define(CONSTANT.MODELS.CUSTOMER, model);
+interface CustomerInstance extends Model<ICustomerAttr, ICustomerCreateAttr> {
+    createdAt?: Date;
+    updateAt?: Date;
+}
+export const Customer = db.sequelize.define<CustomerInstance>(CONSTANT.MODELS.CUSTOMER, model);
