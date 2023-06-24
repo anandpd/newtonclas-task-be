@@ -1,21 +1,15 @@
-import {Pool, ClientBase, PoolClient} from 'pg';
 import logger from './logger';
+import { Sequelize } from 'sequelize';
 
-let pool:Pool;
-let client:PoolClient;
 
-async function connectDB(){
-    pool = new Pool({
-        user: process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD,
-        database: process.env.POSTGRES_DB,
-        host: process.env.POSTGRES_HOST,
-        port: Number(process.env.POSTGRES_PORT)
-    });
-    client = await pool.connect();
-    pool ? logger.info(`Pool established OK`) : logger.error("Pool connection failed !");
-    client ? logger.info(`Client connected OK`) : logger.error("Client not connected !");
-    return {client, pool};
+async function connectDB(connectionString: string): Promise<void> {
+    try {
+        const sequelize = new Sequelize(connectionString);
+        await sequelize.authenticate();
+        logger.info(`DB connected OK`)
+    } catch (error) {
+        logger.error("DB not connected !");
+    }
 }
 
 export default connectDB;
