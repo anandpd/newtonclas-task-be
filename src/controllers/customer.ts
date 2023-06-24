@@ -74,5 +74,20 @@ export const customerController = {
             }
             return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
         }
+    },
+    getAllCustomer: async (req: Request, res: Response) => {
+        try {
+            const customers = await Customer.findAll({
+                order: [
+                    ['createdAt', 'DESC']
+                ]
+            });
+            return HttpResponse(res, { data: customers });
+        } catch (error: any) {
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
+            }
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+        }
     }
 }
