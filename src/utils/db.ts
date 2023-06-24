@@ -1,15 +1,19 @@
 import logger from './logger';
 import { Sequelize } from 'sequelize';
 
-
-async function connectDB(connectionString: string): Promise<void> {
+async function connectDB(connectionString: string): Promise<any> {
     try {
-        const sequelize = new Sequelize(connectionString);
+        let sequelize = new Sequelize(connectionString, {
+            dialect: 'postgres'
+        });
         await sequelize.authenticate();
-        logger.info(`DB connected OK`)
+        await sequelize.sync({ force: true });
+        console.log("Sync done!");
+        logger.info(`DB connected OK`);
+        return sequelize;
     } catch (error) {
-        logger.error("DB not connected !");
+        logger.error(`DB not connected, reason = ${JSON.stringify(error)}`);
     }
 }
 
-export default connectDB;
+export { connectDB };
