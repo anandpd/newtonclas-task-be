@@ -1,0 +1,17 @@
+# Base Dockerfile
+
+version: '3'
+services:
+  server:
+    container_name: "newton-node-container"
+    build: ./
+    ports:
+      - "3030:4000"
+    env_file:
+      - ./.env
+
+  database:
+    container_name: "newton-pg-container"
+    image: postgres
+    env_file:
+      - ./.env
