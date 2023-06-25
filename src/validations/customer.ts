@@ -31,7 +31,7 @@ export const customerIdUpdateValidation = (req: any, res: Response, next: NextFu
     const schemas = [
         {
             schema: joi.object({
-                id: joi.string().guid() // 128 bit uuid
+                id: joi.string().uuid() // 128 bit uuid
             }),
             on: 'params'
         },
@@ -66,7 +66,7 @@ export const customerIdUpdateValidation = (req: any, res: Response, next: NextFu
 export const customerIdValidation = (req: any, res: Response, next: NextFunction) => {
     const data = req.params;
     const schema = joi.object({
-        id: joi.string().guid() // 128 bit uuid
+        id: joi.string().uuid() // 128 bit uuid
     })
 
     let { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });

@@ -29,7 +29,8 @@ export const createTicketValidation = (req: Request, res: Response, next: NextFu
         seatNum: joi.number().integer().required(),
         addOns: joi.string().optional(),
         customerId: joi.string().required(),
-        movieId: joi.string().required()
+        movieId: joi.string().required(),
+        createdAt: joi.string().isoDate().optional()
     });
     const error = baseValidator(schema, data);
     if (error) {
@@ -47,7 +48,7 @@ export const ticketIdUpdateValidation = (req: any, res: Response, next: NextFunc
     const schemas = [
         {
             schema: joi.object({
-                id: joi.string().guid() // 128 bit uuid
+                id: joi.string().uuid() // 128 bit uuid
             }),
             on: 'params'
         },
