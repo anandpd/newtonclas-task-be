@@ -13,14 +13,14 @@ import { AnalyticsTypeEnum } from "../interfaces/Analytics.enum";
 export const analyticsController = {
     getCustomerAnalytics: async (req: Request, res: Response) => {
         try {
-            const { method,allowNullObjects } = req.query;
+            const { method, allowNullObjects } = req.query;
             const { fromDate, toDate } = req.body;
             const fromMonth = moment(fromDate).month();
             const toMonth = moment(toDate).month();
 
             // no. of tickets sold is the count of people
             if (method == CONSTANT.QUERY_METHOD.JS) {
-                let analyticsJsRes: Array<AnalyticsData.ITicketAnalyticsRes> = [];
+                let analyticsJsRes: Array<AnalyticsData.ICustomerAnalytics> = [];
                 let allTickets = await Ticket.findAll({
                     where: {},
                     order: [
@@ -31,7 +31,7 @@ export const analyticsController = {
                 let totalCount: number = 0;
                 if (fromMonth == toMonth) {
                     totalCount = helper.getAnalyticsJS(allTickets, fromDate, toDate);
-                    if (totalCount > 0 || allowNullObjects == "true"){
+                    if (totalCount > 0 || allowNullObjects == "true") {
                         analyticsJsRes.push({
                             month: fromMonth + 1, // 1 idx
                             totalVisit: totalCount
@@ -39,35 +39,19 @@ export const analyticsController = {
                     }
                 } else {
                     let currMonth = moment(fromDate).month();
-                    let monthDateRange;
+                    let monthDateRange: any;
                     for (let i = currMonth; i <= toMonth; i++) {
-                        if (i == currMonth) {
-                            monthDateRange = helper.getDateRange(i);
-                            totalCount = helper.getAnalyticsJS(allTickets, moment(fromDate).toDate(), moment(monthDateRange?.endOfMonth).toDate());
-                            if (totalCount > 0 || allowNullObjects == "true") {
-                                analyticsJsRes.push({
-                                    month: i + 1,
-                                    totalVisit: totalCount
-                                });
-                            }
-                        } else if (i == toMonth) {
-                            monthDateRange = helper.getDateRange(i);
-                            totalCount = helper.getAnalyticsJS(allTickets, moment(monthDateRange?.startOfMonth).toDate(), moment(toDate).toDate());
-                            if (totalCount > 0 || allowNullObjects == "true") {
-                                analyticsJsRes.push({
-                                    month: i + 1,
-                                    totalVisit: totalCount
-                                });
-                            }
-                        } else {
-                            monthDateRange = helper.getDateRange(i);
-                            totalCount = helper.getAnalyticsJS(allTickets, moment(monthDateRange?.startOfMonth).toDate(), moment(monthDateRange?.endOfMonth).toDate());
-                            if (totalCount > 0 || allowNullObjects == "true") {
-                                analyticsJsRes.push({
-                                    month: i + 1,
-                                    totalVisit: totalCount
-                                });
-                            }
+                        monthDateRange = helper.getDateRange(i);
+                        totalCount = helper.getAnalyticsJS(
+                            allTickets,
+                            moment(i == currMonth ? fromDate : monthDateRange?.startOfMonth).toDate(),
+                            moment(i == toMonth ? toDate : monthDateRange?.endOfMonth).toDate()
+                        );
+                        if (totalCount > 0 || allowNullObjects == "true") {
+                            analyticsJsRes.push({
+                                month: i + 1,
+                                totalVisit: totalCount
+                            });
                         }
                     }
                 }
@@ -76,7 +60,7 @@ export const analyticsController = {
                 return HttpResponse(res, { data: analyticsJsRes, message: `Got ${analyticsJsRes.length} month results from ${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')} using javascript !` });
             } else {
                 // need data for single month only
-                let data: AnalyticsData.ITicketAnalyticsRes[] = await helper.getCustomerAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
+                let data: AnalyticsData.ICustomerAnalytics[] = await helper.getCustomerAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
                 let allMonthsSet: Set<number> = new Set();
                 data.map(x => allMonthsSet.add(+x.month)); // 1 idx
                 data = helper.mapMonthNames(data, AnalyticsTypeEnum.Customer, fromMonth, toMonth, allMonthsSet, allowNullObjects == "true");
@@ -93,16 +77,61 @@ export const analyticsController = {
     geProfitAnalytics: async (req: Request, res: Response) => {
         try {
             const { fromDate, toDate } = req.body;
-            const {method, allowNullObjects} = req.query;
-            let amountAnalyticsAgg: Array<AnalyticsData.ICustomerAnalytics>;
-            if (method == CONSTANT.QUERY_METHOD.JS){
+            const { method, allowNullObjects } = req.query;
+            const fromMonth = moment(fromDate).month();
+            const toMonth = moment(toDate).month();
 
+            let amountAnalyticsAgg: Array<AnalyticsData.IProfitAnalytics>;
+            if (method == CONSTANT.QUERY_METHOD.JS) {
+                let profit = await Ticket.findAll({
+                    where: {
+                        createdAt: {
+                            [Op.gte]: moment(fromDate).toDate(),
+                            [Op.lte]: moment(toDate).toDate()
+                        }
+                    },
+                    order: [
+                        ['createdAt', 'DESC']
+                    ],
+                    raw: true
+                });
+                let totalAmount: number = 0;
+                let geProfitAnalyticsJs: Array<AnalyticsData.IProfitAnalytics> = [];
+                if (fromMonth == toMonth) {
+                    totalAmount = helper.getProfitAnalyticsJS(profit, moment(fromDate).toDate(), moment(toDate).toDate());
+                    if (totalAmount > 0 || allowNullObjects == "true") {
+                        geProfitAnalyticsJs.push({
+                            month: fromMonth + 1,
+                            totalAmount: totalAmount
+                        })
+                    }
+                } else {
+                    let currMonth = moment(fromDate).month();
+                    let monthDateRange: AnalyticsData.IMonthRange;
+                    for (let i = currMonth; i <= toMonth; i++) {
+                        monthDateRange = helper.getDateRange(i);
+                        totalAmount = helper.getProfitAnalyticsJS(
+                            profit,
+                            moment(i == currMonth ? fromDate : monthDateRange?.startOfMonth).toDate(),
+                            moment(i == toMonth ? toDate : monthDateRange?.endOfMonth).toDate()
+                        );
+                        if (totalAmount > 0 || allowNullObjects == "true") {
+                            geProfitAnalyticsJs.push({
+                                month: i + 1,
+                                totalAmount: totalAmount
+                            });
+                        }
+                        // }
+                    }
+                }
+                const allMonthsSet: Set<number> = new Set();
+                geProfitAnalyticsJs.map(x => allMonthsSet.add(+x.month));
+                geProfitAnalyticsJs = helper.mapMonthNames(geProfitAnalyticsJs, AnalyticsTypeEnum.Profit, fromMonth, toMonth, allMonthsSet, allowNullObjects == "true");
+                return HttpResponse(res, { data: geProfitAnalyticsJs, message: `Got ${geProfitAnalyticsJs.length} month results from ${moment(fromDate).format('DD/MM/YYYY')} to ${moment(toDate).format('DD/MM/YYYY')} using javascript!` });
             } else {
                 amountAnalyticsAgg = await helper.getProfitAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
                 let allMonthsSet: Set<number> = new Set();
                 amountAnalyticsAgg.map(x => allMonthsSet.add(+x.month));
-                const fromMonth = moment(fromDate).month();
-                const toMonth = moment(toDate).month();
                 amountAnalyticsAgg = helper.mapMonthNames(amountAnalyticsAgg, AnalyticsTypeEnum.Profit, fromMonth, toMonth, allMonthsSet, allowNullObjects == "true");
                 return HttpResponse(res, { data: amountAnalyticsAgg, message: `Got ${amountAnalyticsAgg.length} month results from ${moment(fromDate).format('DD/MM/YYYY')} to ${moment(toDate).format('DD/MM/YYYY')} using aggregation()` })
             }

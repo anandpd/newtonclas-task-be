@@ -1,18 +1,18 @@
 
 declare namespace AnalyticsData {
-    interface ITicketAnalyticsRes {
+    interface ICustomerAnalytics {
         month: StringOrNum,
         totalVisit: StringOrNum
     }
     type StringOrNum = string | number;
 
-    interface ICustomerAnalytics {
+    interface IProfitAnalytics {
         month: StringOrNum,
         totalAmount: StringOrNum
     }
-
-    interface IAnalyticsRequest extends Request{
-        method: string,
-        allowNullObjects: boolean
+    interface IMonthRange {
+        startOfMonth: moment.Moment,
+        endOfMonth: moment.Moment
     }
+
 }

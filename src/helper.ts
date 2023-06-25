@@ -33,17 +33,17 @@ export const helper = {
     },
     getAnalyticsJS: (data: any[], fromDate: Date, toDate: Date): number => {
         data = data.filter(x => {
-            return (moment(x.createdAt).toDate() >= moment(fromDate).toDate()) && (moment(x.createdAt).toDate() <= moment(toDate).toDate());
+            return (x.createdAt >= fromDate) && (x.createdAt <= toDate);
         });
         return data.length;
     },
-    getDateRange: (monthIdx: number) => {
+    getDateRange: (monthIdx: number):AnalyticsData.IMonthRange  => {
         try {
             const startOfMonth = moment().month(monthIdx).startOf('month');
             const endOfMonth = moment().month(monthIdx).endOf('month');
             return { startOfMonth, endOfMonth };
-        } catch (error) {
-            error;
+        } catch (error:any) {
+            return error;
         }
     },
     getProfitAnalyticsAgg: async (fromDate: Date, toDate: Date): Promise<any> => {
@@ -70,6 +70,22 @@ export const helper = {
             return error;
         }
     },
+    getProfitAnalyticsJS: (data: any[], fromDate: Date, toDate: Date): number => {
+        try {
+            // will filter date;
+            data = data.filter(x => {
+                return (moment(x.createdAt).toDate() >= fromDate) && (moment(x.createdAt).toDate() <= toDate);
+            });
+            // return total amount in date range
+            let totalAmount = { price: 0 };
+            totalAmount = data.reduce((prevVal, currVal) => {
+                return { price: prevVal.price + currVal.price }
+            }, { price: 0 });
+            return totalAmount.price;
+        } catch (error: any) {
+            return error;
+        }
+    },
     mapMonthNames: (data: any[], type: AnalyticsTypeEnum, fromMonth: number, toMonth: number, s: Set<number>, allowNullObjects: boolean = false): any[] => {
         const mapMonthArr = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
         if (type == AnalyticsTypeEnum.Customer) {
@@ -81,8 +97,8 @@ export const helper = {
             }
             for (let i = 0; i < data.length; i++) {
                 // raw response
-                (data[i] as AnalyticsData.ITicketAnalyticsRes).month = mapMonthArr[+(data[i].month) - 1];
-                (data[i] as AnalyticsData.ITicketAnalyticsRes).totalVisit = +(data[i] as AnalyticsData.ITicketAnalyticsRes).totalVisit;
+                (data[i] as AnalyticsData.ICustomerAnalytics).month = mapMonthArr[+(data[i].month) - 1];
+                (data[i] as AnalyticsData.ICustomerAnalytics).totalVisit = +(data[i] as AnalyticsData.ICustomerAnalytics).totalVisit;
 
             }
             logger.debug(data);
