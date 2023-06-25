@@ -2,7 +2,7 @@
 declare namespace AnalyticsData {
     interface IAnalyticsRes {
         month: StringOrNum,
-        ticketCount: StringOrNum
+        totalVisit: StringOrNum
     }
     interface IAnalyticsData extends IAnalyticsRes {
         dataValues?: any;

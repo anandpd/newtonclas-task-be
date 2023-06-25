@@ -31,7 +31,7 @@ export const analyticsController = {
                     totalCount = helper.getAnalyticsJS(allTickets, fromDate, toDate);
                     analyticsJsRes.push({
                         month: fromMonth + 1, // 1 idx
-                        ticketCount: totalCount
+                        totalVisit: totalCount
                     });
                 } else {
                     let currMonth = moment(fromDate).month();
@@ -42,21 +42,21 @@ export const analyticsController = {
                             totalCount = helper.getAnalyticsJS(allTickets, moment(fromDate).toDate(), moment(monthDateRange?.endOfMonth).toDate());
                             analyticsJsRes.push({
                                 month: i + 1,
-                                ticketCount: totalCount
+                                totalVisit: totalCount
                             });
                         } else if (i == toMonth) {
                             monthDateRange = helper.getDateRange(i);
                             totalCount = helper.getAnalyticsJS(allTickets, moment(monthDateRange?.startOfMonth).toDate(), moment(toDate).toDate());
                             analyticsJsRes.push({
                                 month: i + 1,
-                                ticketCount: totalCount
+                                totalVisit: totalCount
                             });
                         } else {
                             monthDateRange = helper.getDateRange(i);
                             totalCount = helper.getAnalyticsJS(allTickets, moment(monthDateRange?.startOfMonth).toDate(), moment(monthDateRange?.endOfMonth).toDate());
                             analyticsJsRes.push({
                                 month: i + 1,
-                                ticketCount: totalCount
+                                totalVisit: totalCount
                             });
                         }
                     }

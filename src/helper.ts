@@ -14,9 +14,8 @@ export const helper = {
                     }
                 },
                 attributes: [
-                    // sequelize.cast(sequelize.col('id'), 'varchar'),
                     [literal(`extract(month from "createdAt")`), 'month'],
-                    [literal(`count ("ticketId")`), 'ticketCount'],
+                    [literal(`count ("ticketId")`), 'totalVisit'],
                 ],
                 group: [
                     'month'
@@ -25,7 +24,7 @@ export const helper = {
 
             });
             const m = moment(fromDate).month();
-            return data.length > 0 ? data[0] : { month: String(m + 1), ticketCount: "0" };
+            return data.length > 0 ? data[0] : { month: String(m + 1), totalVisit: "0" };
         } catch (error) {
             throw error;
         }
@@ -48,14 +47,14 @@ export const helper = {
     mapMonthNames: (data: AnalyticsData.IAnalyticsData[]): AnalyticsData.IAnalyticsRes[] => {
         const mapMonthArr = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
         for (let i = 0; i < data.length; i++) {
-            console.log("Updating ", data[i]);
-            console.log("to val => ", mapMonthArr[+(data[i].month) - 1]);
+            // sequelize instance
             if (data[i].dataValues) {
-                data[i].dataValues.ticketCount = +data[i].dataValues.ticketCount;
+                data[i].dataValues.totalVisit = +data[i].dataValues.totalVisit;
                 data[i].dataValues.month = mapMonthArr[+(data[i].dataValues.month) - 1];
             } else {
+                // raw response
                 data[i].month = mapMonthArr[+(data[i].month) - 1];
-                data[i].ticketCount = +data[i].ticketCount;
+                data[i].totalVisit = +data[i].totalVisit;
             }
         }
         logger.debug(data);
