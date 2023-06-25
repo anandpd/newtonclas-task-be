@@ -44,7 +44,9 @@ export interface ITicketAttr {
     seatNum: number,
     addOns?: string,
     customerId: string,
-    movieId: string
+    movieId: string,
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 export interface ITicketCreateAttr extends Optional<ITicketAttr, 'ticketId'> { }

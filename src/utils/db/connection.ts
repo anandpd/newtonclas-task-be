@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import { CONSTANT } from '../constant';
 import logger from '../logger';
 
-const sequelize = new Sequelize(CONSTANT.CONNECTION_STRING, { dialect: 'postgres', logging: false });
+const sequelize = new Sequelize(CONSTANT.CONNECTION_STRING, { dialect: 'postgres', logging: true });
 (async () => {
     await sequelize.authenticate();
     logger.info(CONSTANT.LOGGING.DATABASE.SUCCESS);

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ticketController } from '../controllers';
 import { VerifyAuth } from '../middlewares/auth';
-import { ticketIdValidation, ticketIdUpdateValidation, createTicketValidation } from '../validations/ticket';
+import { ticketIdValidation, ticketIdUpdateValidation, createTicketValidation, getAnalyticsValidation } from '../validations/ticket';
 const router = Router();
 
 /**

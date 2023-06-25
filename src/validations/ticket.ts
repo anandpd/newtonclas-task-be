@@ -79,3 +79,34 @@ export const ticketIdUpdateValidation = (req: any, res: Response, next: NextFunc
     })
     next();
 }
+
+export const getAnalyticsValidation = (req: any, res: Response, next: NextFunction) => {
+    const schemas = [
+        {
+            schema: joi.object({
+                method: joi.string().valid("aggregate", "javascript").required()
+            }),
+            on: 'query'
+        },
+        {
+            schema: joi.object({
+                fromDate: joi.string().isoDate().required(),
+                toDate: joi.string().isoDate().required(),
+            }),
+            on: 'body'
+        }
+    ];
+    schemas.map(s => {
+        let { schema, on } = s;
+        let { error, value } = schema.validate(req[on], { errors: { wrap: { label: '' } } });
+        if (error) {
+            logger.error("Error while validating => ", error);
+            return HttpResponse(res, {
+                statusCode: CONSTANT.HTTP_STATUS.BAD_REQUEST,
+                message: error.message,
+                success: false
+            });
+        }
+    });
+    next();
+}

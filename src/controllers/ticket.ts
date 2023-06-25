@@ -145,5 +145,5 @@ export const ticketController = {
                 error: error
             })
         }
-    },
+    }
 }
