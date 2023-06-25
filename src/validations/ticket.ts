@@ -84,7 +84,8 @@ export const getAnalyticsValidation = (req: any, res: Response, next: NextFuncti
     const schemas = [
         {
             schema: joi.object({
-                method: joi.string().valid("aggregate", "javascript").required()
+                method: joi.string().valid("aggregate", "javascript").required(),
+                allowNullObjects: joi.bool().optional()
             }),
             on: 'query'
         },

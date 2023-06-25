@@ -10,4 +10,9 @@ declare namespace AnalyticsData {
         month: StringOrNum,
         totalAmount: StringOrNum
     }
+
+    interface IAnalyticsRequest extends Request{
+        method: string,
+        allowNullObjects: boolean
+    }
 }

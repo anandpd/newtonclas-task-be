@@ -70,13 +70,15 @@ export const helper = {
             return error;
         }
     },
-    mapMonthNames: (data: any[], type: AnalyticsTypeEnum, fromMonth: number, toMonth: number, s: Set<number>): any[] => {
+    mapMonthNames: (data: any[], type: AnalyticsTypeEnum, fromMonth: number, toMonth: number, s: Set<number>, allowNullObjects: boolean = false): any[] => {
         const mapMonthArr = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
         if (type == AnalyticsTypeEnum.Customer) {
-            for (let i = fromMonth; i <= toMonth; i++) {
-                if (!s.has(i + 1)) data.push({ month: i + 1, totalVisit: 0 })
+            if (allowNullObjects) {
+                for (let i = fromMonth; i <= toMonth; i++) {
+                    if (!s.has(i + 1)) data.push({ month: i + 1, totalVisit: 0 })
+                }
+                data = data.sort((a, b) => a.month - b.month);
             }
-            data = data.sort((a,b) => a.month - b.month);
             for (let i = 0; i < data.length; i++) {
                 // raw response
                 (data[i] as AnalyticsData.ITicketAnalyticsRes).month = mapMonthArr[+(data[i].month) - 1];
@@ -87,11 +89,13 @@ export const helper = {
             return data;
         } else {
             // type is profit
-            for (let i = fromMonth; i <= toMonth; i++) {
-                if (!s.has(i + 1)) data.push({ month: i + 1, totalAmount: 0 })
+            if (allowNullObjects) {
+                for (let i = fromMonth; i <= toMonth; i++) {
+                    if (!s.has(i + 1)) data.push({ month: i + 1, totalAmount: 0 })
+                }
+                data = data.sort((a, b) => a.month - b.month);
+
             }
-            data = data.sort((a,b) => a.month - b.month);
-            console.log("Data ============> ", data);
             for (let i = 0; i < data.length; i++) {
                 if (data[i].month) {
                     data[i].month = mapMonthArr[+data[i].month - 1];
