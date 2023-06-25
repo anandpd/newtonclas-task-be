@@ -11,21 +11,23 @@ export function VerifyAuth(role: string = CONSTANT.ROLE.USER) {
                 message: "Auth is required",
                 data: null
             });
-            if (role == CONSTANT.ROLE.USER && auth != CONSTANT.TOKEN_ACCESS.USER) {
+            if (role == CONSTANT.ROLE.USER) {
+                if (auth == CONSTANT.TOKEN_ACCESS.ADMIN) next();
+                else if (auth == CONSTANT.TOKEN_ACCESS.USER) next();
+                else return res.status(CONSTANT.HTTP_STATUS.UNAUTHORIZED).json({
+                    success: false,
+                    message: "Not Authorized to perform action on this route",
+                    data: null
+                });
+            }
+            if (role == CONSTANT.ROLE.ADMIN && auth == CONSTANT.TOKEN_ACCESS.ADMIN) next();
+            else {
                 return res.status(CONSTANT.HTTP_STATUS.UNAUTHORIZED).json({
                     success: false,
                     message: "Not Authorized to perform action on this route",
                     data: null
                 });
             }
-            if (role == CONSTANT.ROLE.ADMIN && auth != CONSTANT.TOKEN_ACCESS.ADMIN) {
-                return res.status(CONSTANT.HTTP_STATUS.UNAUTHORIZED).json({
-                    success: false,
-                    message: "Not Authorized to perform action on this route",
-                    data: null
-                });
-            }
-            next();
         } catch (error) {
             logger.error(error);
             throw error;
