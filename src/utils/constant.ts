@@ -39,6 +39,14 @@ const CONSTANT = {
         POST: "POST",
         PUT: "PUT",
         DELETE: "DELETE"
+    },
+    TOKEN_ACCESS: {
+        USER: 'Bearer Token',
+        ADMIN: 'Bearer Admin'
+    },
+    ROLE: {
+        ADMIN: "ADMIN",
+        USER: "USER"
     }
 }
 
