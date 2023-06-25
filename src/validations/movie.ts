@@ -26,17 +26,14 @@ export const movieIdUpdateValidation = (req: any, res: Response, next: NextFunct
     const schemas = [
         {
             schema: joi.object({
-                id: joi.string().guid() // 128 bit uuid
+                id: joi.string().uuid() // 128 bit uuid
             }),
             on: 'params'
         },
         {
             schema: joi.object({
-                firstName: joi.string().optional(),
-                lastName: joi.string().optional(),
-                age: joi.number().integer().optional(),
-                sex: joi.string().optional().valid("M", "F", "O"),
-                address: joi.string().optional()
+                movieTitle: joi.string().max(100),
+                movieTime: joi.number().integer() // run time
             }),
             on: 'body'
         }
@@ -60,7 +57,7 @@ export const movieIdUpdateValidation = (req: any, res: Response, next: NextFunct
 export const movieIdValidation = (req: any, res: Response, next: NextFunction) => {
     const data = req.params;
     const schema = joi.object({
-        id: joi.string().guid() // 128 bit uuid
+        id: joi.string().uuid() // 128 bit uuid
     })
 
     let { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });

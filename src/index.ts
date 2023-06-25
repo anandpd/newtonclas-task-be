@@ -27,4 +27,4 @@ process.on('uncaughtException', (e: Error) => {
 app.use(errorHandler);
 app.use(notFoundHandler);
 
-app.listen(PORT, () => logger.info(CONSTANT.LOGGING.SERVER.SUCCESS));
+app.listen(PORT, () => logger.info(CONSTANT.LOGGING.SERVER.SUCCESS(+PORT) ));

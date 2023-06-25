@@ -12,15 +12,15 @@ export function VerifyAuth(role: string = CONSTANT.ROLE.USER) {
                 data: null
             });
             if (role == CONSTANT.ROLE.USER) {
-                if (auth == CONSTANT.TOKEN_ACCESS.ADMIN) next();
-                else if (auth == CONSTANT.TOKEN_ACCESS.USER) next();
+                if (auth == CONSTANT.TOKEN_ACCESS.ADMIN) return next();
+                else if (auth == CONSTANT.TOKEN_ACCESS.USER) return next();
                 else return res.status(CONSTANT.HTTP_STATUS.UNAUTHORIZED).json({
                     success: false,
                     message: "Not Authorized to perform action on this route",
                     data: null
                 });
             }
-            if (role == CONSTANT.ROLE.ADMIN && auth == CONSTANT.TOKEN_ACCESS.ADMIN) next();
+            if (role == CONSTANT.ROLE.ADMIN && auth == CONSTANT.TOKEN_ACCESS.ADMIN) return next();
             else {
                 return res.status(CONSTANT.HTTP_STATUS.UNAUTHORIZED).json({
                     success: false,

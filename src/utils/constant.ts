@@ -11,7 +11,7 @@ const CONSTANT = {
     },
     LOGGING: {
         SERVER: {
-            SUCCESS: "Server is up and running.",
+            SUCCESS: (port: number) => `Server is up and running on port ${port}`,
             FAILURE: "Server failed to connect."
         },
         DATABASE: {

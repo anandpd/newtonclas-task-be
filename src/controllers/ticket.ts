@@ -79,6 +79,16 @@ export const ticketController = {
                 movieId: req.body.movieId
             };
             if (req.body.addOns) createTicketInstance.addOns = req.body.addOns;
+            if (req.body.createdAt) createTicketInstance.createdAt = req.body.createdAt;
+
+            let preCheckPromise: Array<Promise<any>> = [
+                Customer.findByPk(createTicketInstance.customerId),
+                Movie.findByPk(createTicketInstance.movieId)
+            ];
+            preCheckPromise = await Promise.all(preCheckPromise);
+            if (preCheckPromise[0] == null) return HttpResponse(res, {success: false, message: "Customer doesnt exists !"});
+            else if (preCheckPromise[1] == null) return HttpResponse(res, {success: false, message: "Movie doesnt exists !"});
+
             const dbRes = await Ticket.create(createTicketInstance);
             return HttpResponse(res, { data: dbRes, statusCode: CONSTANT.HTTP_STATUS.OK, message: `Ticket "${id}" created successfully !` })
 
