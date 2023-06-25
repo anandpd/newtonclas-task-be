@@ -10,13 +10,14 @@ import { helper } from "../helper";
 
 
 export const analyticsController = {
-    getAnalytics: async (req: Request, res: Response) => {
+    getCustomerAnalytics: async (req: Request, res: Response) => {
         try {
             const { method } = req.query;
             const { fromDate, toDate } = req.body;
             const fromMonth = moment(fromDate).month();
             const toMonth = moment(toDate).month();
 
+            // no. of tickets sold is the count of people
             if (method == CONSTANT.QUERY_METHOD.JS) {
                 let analyticsJsRes: Array<AnalyticsData.IAnalyticsRes> = [];
                 let allTickets = await Ticket.findAll({
@@ -112,4 +113,27 @@ export const analyticsController = {
             return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
         }
     },
+    geProfitAnalytics: async (req: Request, res: Response) => {
+        try {
+            const { fromDate, toDate } = req.body;
+            const amountAnalyticsAgg = await Ticket.findAll({
+                where: {
+                    createdAt: {
+                        [Op.gte]: fromDate,
+                        [Op.lte]: toDate
+                    }
+                },
+                attributes: [
+                    [literal(`extract(month from "createdAt")`), 'month'],
+                    [Sequelize.fn('sum', Sequelize.col('price')), 'totalAmount']
+                ],
+                group: [
+                    "month"
+                ]
+            });
+            return HttpResponse(res, { data: amountAnalyticsAgg })
+        } catch (error) {
+            throw error;
+        }
+    }
 }
