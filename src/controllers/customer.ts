@@ -3,19 +3,29 @@ import { HttpResponse } from "../middlewares/http-handlers";
 import { CONSTANT } from "../utils/constant";
 import { v4 as uuidv4 } from 'uuid';
 import { Customer } from '../models';
+import { ICustomerAttr } from "../models/Customer";
 
 export const customerController = {
     createCustomer: async (req: Request, res: Response) => {
         try {
             let id = uuidv4();
-            const dbRes = await Customer.create({
+            const customer: ICustomerAttr = {
                 customerId: id,
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 age: req.body.age,
                 sex: req.body.sex,
-                address: req.body.address
+                address: req.body.address,
+                email: req.body.email
+            }
+            if (req.body.createdAt) customer.createdAt = req.body.createdAt;
+            const isExist = await Customer.findOne({
+                where: {
+                    email: customer.email
+                }
             });
+            if (isExist) return HttpResponse(res, {message: "Customer with this email already exists !"});
+            const dbRes = await Customer.create(customer);
             return HttpResponse(res, { data: dbRes, statusCode: CONSTANT.HTTP_STATUS.OK, message: "Customer created successfully !" })
 
         } catch (error: any) {

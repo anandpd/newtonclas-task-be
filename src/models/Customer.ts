@@ -29,6 +29,11 @@ const model = {
     address: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
     }
 };
 
@@ -38,7 +43,9 @@ export interface ICustomerAttr {
     lastName: string,
     age: number,
     sex: string,
-    address: string
+    address: string,
+    email: string,
+    createdAt?: Date
 }
 
 export interface ICustomerCreateAttr extends Optional<ICustomerAttr, 'customerId'> { }

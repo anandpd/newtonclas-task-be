@@ -11,7 +11,9 @@ export const createCustomerValidation = (req: Request, res: Response, next: Next
         lastName: joi.string().required(),
         age: joi.number().integer().required(),
         sex: joi.string().required().valid("M", "F", "O"),
-        address: joi.string().required()
+        address: joi.string().required(),
+        email: joi.string().email().required(),
+        createdAt: joi.string().isoDate().optional()
 
     });
     const { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
@@ -39,7 +41,8 @@ export const customerIdUpdateValidation = (req: any, res: Response, next: NextFu
                 lastName: joi.string().optional(),
                 age: joi.number().integer().optional(),
                 sex: joi.string().optional().valid("M", "F", "O"),
-                address: joi.string().optional()
+                address: joi.string().optional(),
+                email: joi.string().email().optional()
             }),
             on: 'body'
         }

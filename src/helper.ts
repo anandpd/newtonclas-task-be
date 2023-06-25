@@ -1,7 +1,6 @@
 import { Ticket } from './models';
-import { literal, Op } from 'sequelize';
+import { literal, Op, Sequelize } from 'sequelize';
 import moment, { Moment } from 'moment';
-import { Sequelize } from 'sequelize';
 import logger from './utils/logger';
 import { AnalyticsTypeEnum } from './interfaces/Analytics.enum';
 
@@ -25,7 +24,6 @@ export const helper = {
                 raw: true
 
             });
-            const m = moment(fromDate).month();
             return data;
         } catch (error) {
             throw error;
