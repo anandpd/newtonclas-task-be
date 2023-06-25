@@ -25,7 +25,7 @@ API's for: Customer, Ticket, Movie and Analytics.
 
 ## 🔗 Links
 
-[Postman collection Link](https://api.postman.com/collections/18253477-5bf2d0d6-2c89-4bf3-88ca-36454ee4eb7f?access_key=PMAT-01H3SPDJCVFRWC473T0JYG2WPF)
+[Postman collection Link](https://api.postman.com/collections/18253477-5bf2d0d6-2c89-4bf3-88ca-36454ee4eb7f?access_key=PMAT-01H3SXF77SKM22VENT3HFDPE45)
 
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ananddpd)
 
@@ -55,9 +55,11 @@ API's for: Customer, Ticket, Movie and Analytics.
 - Server should be running on specified port.
 
 ## NOTE
-There are 2 tokens, one for normal user and one for admin.
+1. There are 2 tokens, one for normal user and one for admin.
 Currently it's statically verified.
 For normal user send ```auth: Bearer Token``` in headers. For Admin send ```auth: Bearer Admin```.
+
+2. Port for Docker and non docker application are different, please update if needed for docker ```PORT=3030```, for non-dockerized app ```PORT=4000```
 
 
 
