@@ -9,7 +9,7 @@ const router = Router();
 router.post('/', VerifyAuth(), createCustomerValidation, customerController.createCustomer);
 
 /** read */
-router.get('/', VerifyAuth(), customerController.getAllCustomer);
+router.get('/', VerifyAuth(CONSTANT.ROLE.ADMIN), customerController.getAllCustomer);
 router.get('/:id', VerifyAuth(), customerIdValidation, customerController.getCustomerByPK);
 
 /** update */
