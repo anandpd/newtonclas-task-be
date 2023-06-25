@@ -1,11 +1,13 @@
 
 declare namespace AnalyticsData {
-    interface IAnalyticsRes {
+    interface ITicketAnalyticsRes {
         month: StringOrNum,
         totalVisit: StringOrNum
     }
-    interface IAnalyticsData extends IAnalyticsRes {
-        dataValues?: any;
-    }
     type StringOrNum = string | number;
+
+    interface ICustomerAnalytics {
+        month: StringOrNum,
+        totalAmount: StringOrNum
+    }
 }

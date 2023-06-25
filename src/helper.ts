@@ -1,10 +1,12 @@
 import { Ticket } from './models';
 import { literal, Op } from 'sequelize';
 import moment, { Moment } from 'moment';
+import { Sequelize } from 'sequelize';
 import logger from './utils/logger';
+import { AnalyticsTypeEnum } from './interfaces/Analytics.enum';
 
 export const helper = {
-    getAnalyticsDataAgg: async (fromDate: Date, toDate: Date): Promise<any> => {
+    getCustomerAnalyticsAgg: async (fromDate: Date, toDate: Date): Promise<any> => {
         try {
             let data = await Ticket.findAll({
                 where: {
@@ -19,12 +21,12 @@ export const helper = {
                 ],
                 group: [
                     'month'
-                ]
-
+                ],
+                raw: true
 
             });
             const m = moment(fromDate).month();
-            return data.length > 0 ? data[0] : { month: String(m + 1), totalVisit: "0" };
+            return data;
         } catch (error) {
             throw error;
         }
@@ -44,20 +46,58 @@ export const helper = {
             error;
         }
     },
-    mapMonthNames: (data: AnalyticsData.IAnalyticsData[]): AnalyticsData.IAnalyticsRes[] => {
-        const mapMonthArr = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        for (let i = 0; i < data.length; i++) {
-            // sequelize instance
-            if (data[i].dataValues) {
-                data[i].dataValues.totalVisit = +data[i].dataValues.totalVisit;
-                data[i].dataValues.month = mapMonthArr[+(data[i].dataValues.month) - 1];
-            } else {
-                // raw response
-                data[i].month = mapMonthArr[+(data[i].month) - 1];
-                data[i].totalVisit = +data[i].totalVisit;
-            }
+    getProfitAnalyticsAgg: async (fromDate: Date, toDate: Date): Promise<any> => {
+        try {
+            const profit = await Ticket.findAll({
+                where: {
+                    createdAt: {
+                        [Op.gte]: moment(fromDate).toDate(),
+                        [Op.lte]: toDate
+                    }
+                },
+                attributes: [
+                    [literal(`extract(month from "createdAt")`), 'month'],
+                    [Sequelize.fn('sum', Sequelize.col('price')), 'totalAmount']
+                    // eq = [literal(`sum ("price")`), 'totalAmount']
+                ],
+                group: [
+                    "month"
+                ],
+                raw: true
+            });
+            return profit;
+        } catch (error) {
+            return error;
         }
-        logger.debug(data);
-        return data;
+    },
+    mapMonthNames: (data: any[], type: AnalyticsTypeEnum, fromMonth: number, toMonth: number, s: Set<number>): any[] => {
+        const mapMonthArr = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        if (type == AnalyticsTypeEnum.Customer) {
+            for (let i = fromMonth; i <= toMonth; i++) {
+                if (!s.has(i + 1)) data.push({ month: i + 1, totalVisit: 0 })
+            }
+            data = data.sort((a,b) => a.month - b.month);
+            for (let i = 0; i < data.length; i++) {
+                // raw response
+                (data[i] as AnalyticsData.ITicketAnalyticsRes).month = mapMonthArr[+(data[i].month) - 1];
+                (data[i] as AnalyticsData.ITicketAnalyticsRes).totalVisit = +(data[i] as AnalyticsData.ITicketAnalyticsRes).totalVisit;
+
+            }
+            logger.debug(data);
+            return data;
+        } else {
+            // type is profit
+            for (let i = fromMonth; i <= toMonth; i++) {
+                if (!s.has(i + 1)) data.push({ month: i + 1, totalAmount: 0 })
+            }
+            data = data.sort((a,b) => a.month - b.month);
+            console.log("Data ============> ", data);
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].month) {
+                    data[i].month = mapMonthArr[+data[i].month - 1];
+                }
+            }
+            return data;
+        }
     }
 }

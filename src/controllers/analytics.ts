@@ -7,6 +7,7 @@ import { Op, Sequelize, literal } from 'sequelize';
 import db from '../utils/db/connection';
 import moment, { Moment } from 'moment';
 import { helper } from "../helper";
+import { AnalyticsTypeEnum } from "../interfaces/Analytics.enum";
 
 
 export const analyticsController = {
@@ -19,7 +20,7 @@ export const analyticsController = {
 
             // no. of tickets sold is the count of people
             if (method == CONSTANT.QUERY_METHOD.JS) {
-                let analyticsJsRes: Array<AnalyticsData.IAnalyticsRes> = [];
+                let analyticsJsRes: Array<AnalyticsData.ITicketAnalyticsRes> = [];
                 let allTickets = await Ticket.findAll({
                     where: {},
                     order: [
@@ -63,46 +64,14 @@ export const analyticsController = {
                     }
                 }
 
-                analyticsJsRes = helper.mapMonthNames(analyticsJsRes);
+                analyticsJsRes = helper.mapMonthNames(analyticsJsRes, AnalyticsTypeEnum.Customer, fromDate, toDate, new Set);
                 return HttpResponse(res, { data: analyticsJsRes, message: `Got ${analyticsJsRes.length} month results from ${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')} using javascript !` });
             } else {
-                let analyticsPromise = [];
-
                 // need data for single month only
-                if (fromMonth == toMonth) analyticsPromise.push(helper.getAnalyticsDataAgg(moment(fromDate).toDate(), moment(toDate).toDate()));
-                else {
-                    let currMonth = moment(fromDate).month();
-                    let monthStartDate: Moment | undefined;
-                    let monthEndDate: Moment | undefined;
-                    let monthDateRange: any
-                    for (let i = currMonth; i <= toMonth; i++) {
-
-                        // get first month data (maybe partial)
-                        if (i == currMonth) {
-                            monthDateRange = helper.getDateRange(i);
-                            monthStartDate = moment(fromDate);
-                            monthEndDate = monthDateRange?.endOfMonth;
-                            analyticsPromise.push(helper.getAnalyticsDataAgg(moment(monthStartDate).toDate(), moment(monthEndDate).toDate()))
-                        }
-                        // get first last data (maybe partial)
-                        else if (i == toMonth) {
-                            monthDateRange = helper.getDateRange(i);
-                            monthStartDate = monthDateRange?.startOfMonth;
-                            monthEndDate = moment(toDate);
-                            analyticsPromise.push(helper.getAnalyticsDataAgg(moment(monthStartDate).toDate(), moment(monthEndDate).toDate()))
-                        }
-                        // get full month data
-                        else {
-                            monthDateRange = helper.getDateRange(i);
-                            monthStartDate = monthDateRange?.startOfMonth;
-                            monthEndDate = monthDateRange?.endOfMonth;
-                            analyticsPromise.push(helper.getAnalyticsDataAgg(moment(monthStartDate).toDate(), moment(monthEndDate).toDate()));
-                        }
-                    }
-                }
-
-                let data: AnalyticsData.IAnalyticsRes[] = await Promise.all(analyticsPromise);
-                data = helper.mapMonthNames(data);
+                let data: AnalyticsData.ITicketAnalyticsRes[] = await helper.getCustomerAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
+                let allMonthsSet: Set<number> = new Set();
+                data.map(x => allMonthsSet.add(+x.month)); // 1 idx
+                data = helper.mapMonthNames(data, AnalyticsTypeEnum.Customer, fromMonth, toMonth, allMonthsSet);
                 return HttpResponse(res, { data: data, message: `Got ${data.length} month results from ${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')} using aggregation()` });
             }
         } catch (error: any) {
@@ -116,24 +85,25 @@ export const analyticsController = {
     geProfitAnalytics: async (req: Request, res: Response) => {
         try {
             const { fromDate, toDate } = req.body;
-            const amountAnalyticsAgg = await Ticket.findAll({
-                where: {
-                    createdAt: {
-                        [Op.gte]: fromDate,
-                        [Op.lte]: toDate
-                    }
-                },
-                attributes: [
-                    [literal(`extract(month from "createdAt")`), 'month'],
-                    [Sequelize.fn('sum', Sequelize.col('price')), 'totalAmount']
-                ],
-                group: [
-                    "month"
-                ]
-            });
-            return HttpResponse(res, { data: amountAnalyticsAgg })
-        } catch (error) {
-            throw error;
+            const {method} = req.query;
+            let amountAnalyticsAgg: Array<AnalyticsData.ICustomerAnalytics>;
+            if (method == CONSTANT.QUERY_METHOD.JS){
+
+            } else {
+                amountAnalyticsAgg = await helper.getProfitAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
+                let allMonthsSet: Set<number> = new Set();
+                amountAnalyticsAgg.map(x => allMonthsSet.add(+x.month));
+                const fromMonth = moment(fromDate).month();
+                const toMonth = moment(toDate).month();
+                amountAnalyticsAgg = helper.mapMonthNames(amountAnalyticsAgg, AnalyticsTypeEnum.Profit, fromMonth, toMonth, allMonthsSet);
+                return HttpResponse(res, { data: amountAnalyticsAgg, message: `Got ${amountAnalyticsAgg.length} month results from ${moment(fromDate).format('DD/MM/YYYY')} to ${moment(toDate).format('DD/MM/YYYY')} using aggregation()` })
+            }
+        } catch (error: any) {
+            logger.error(`Error in getting analytics = ${error}`)
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
+            }
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
         }
     }
 }
