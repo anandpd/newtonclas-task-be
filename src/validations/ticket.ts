@@ -3,15 +3,15 @@ import logger from '../utils/logger';
 import { NextFunction, Request, Response } from 'express';
 import { HttpResponse } from '../middlewares/http-handlers';
 import { CONSTANT } from '../utils/constant';
+import { baseValidator } from './baseValidation';
 
 export const ticketIdValidation = (req: Request, res: Response, next: NextFunction) => {
     const data = req.params;
     const schema = joi.object({
         id: joi.string().uuid().required()
     });
-    const { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
+    const error = baseValidator(schema, data);
     if (error) {
-        logger.error("Error while validating => ", error);
         return HttpResponse(res, {
             statusCode: CONSTANT.HTTP_STATUS.BAD_REQUEST,
             message: error.message,
@@ -31,7 +31,7 @@ export const createTicketValidation = (req: Request, res: Response, next: NextFu
         customerId: joi.string().required(),
         movieId: joi.string().required()
     });
-    const { error, value } = schema.validate(data, { errors: { wrap: { label: '' } } });
+    const error = baseValidator(schema, data);
     if (error) {
         logger.error("Error while validating => ", error);
         return HttpResponse(res, {
@@ -67,7 +67,7 @@ export const ticketIdUpdateValidation = (req: any, res: Response, next: NextFunc
 
     schemas.map(s => {
         let { schema, on } = s;
-        let { error, value } = schema.validate(req[on], { errors: { wrap: { label: '' } } });
+        let error = baseValidator(schema, req[on]);
         if (error) {
             logger.error("Error while validating => ", error);
             return HttpResponse(res, {
@@ -99,7 +99,7 @@ export const getAnalyticsValidation = (req: any, res: Response, next: NextFuncti
     ];
     schemas.map(s => {
         let { schema, on } = s;
-        let { error, value } = schema.validate(req[on], { errors: { wrap: { label: '' } } });
+        let error = baseValidator(schema, req[on]);
         if (error) {
             logger.error("Error while validating => ", error);
             return HttpResponse(res, {
