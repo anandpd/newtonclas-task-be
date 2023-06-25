@@ -40,7 +40,7 @@ API's for: Customer, Ticket, Movie and Analytics.
 - Make sure docker is installed.
 - Switch branch to ```deploy/docker```
 - Run ```docker-compose up -d```.
-- or ```docker-compose up -d --build``` (*to foce new build*).
+- or ```docker-compose up -d --build``` (*to force new build*).
 - Server should be running on specified port.
 
 ### 2. Without Docker 🔧
