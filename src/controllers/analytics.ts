@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
-import { Customer, Movie, Ticket } from '../models';
+import { Ticket } from '../models';
 import { HttpResponse } from "../middlewares/http-handlers";
 import logger from "../utils/logger";
 import { CONSTANT } from "../utils/constant";
-import { Op, Sequelize, literal } from 'sequelize';
-import db from '../utils/db/connection';
-import moment, { Moment } from 'moment';
+import { Op } from 'sequelize';
+import moment from 'moment';
 import { helper } from "../helper";
 import { AnalyticsTypeEnum } from "../interfaces/Analytics.enum";
-
+import * as service from '../services';
 
 export const analyticsController = {
     getCustomerAnalytics: async (req: Request, res: Response) => {
@@ -21,7 +20,7 @@ export const analyticsController = {
             // no. of tickets sold is the count of people
             if (method == CONSTANT.QUERY_METHOD.JS) {
                 let analyticsJsRes: Array<AnalyticsData.ICustomerAnalytics> = [];
-                let allTickets = await Ticket.findAll({
+                let allTickets = await service.db.FindAll(Ticket,{
                     where: {},
                     order: [
                         ['createdAt', 'DESC']
@@ -59,7 +58,6 @@ export const analyticsController = {
                 analyticsJsRes = helper.mapMonthNames(analyticsJsRes, AnalyticsTypeEnum.Customer, fromDate, toDate, new Set, false);
                 return HttpResponse(res, { data: analyticsJsRes, message: `Got ${analyticsJsRes.length} month results from ${moment(fromDate).format('MM/DD/YYYY')} to ${moment(toDate).format('MM/DD/YYYY')} using javascript !` });
             } else {
-                // need data for single month only
                 let data: AnalyticsData.ICustomerAnalytics[] = await helper.getCustomerAnalyticsAgg(moment(fromDate).toDate(), moment(toDate).toDate());
                 let allMonthsSet: Set<number> = new Set();
                 data.map(x => allMonthsSet.add(+x.month)); // 1 idx
@@ -83,7 +81,7 @@ export const analyticsController = {
 
             let amountAnalyticsAgg: Array<AnalyticsData.IProfitAnalytics>;
             if (method == CONSTANT.QUERY_METHOD.JS) {
-                let profit = await Ticket.findAll({
+                let profit = await service.db.FindAll(Ticket,{
                     where: {
                         createdAt: {
                             [Op.gte]: moment(fromDate).toDate(),

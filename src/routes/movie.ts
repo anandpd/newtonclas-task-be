@@ -6,7 +6,7 @@ import { CONSTANT } from '../utils/constant';
 const router = Router();
 
 /** create */
-router.post('/', VerifyAuth(), createMovieValidation, movieController.createMovie);
+router.post('/', VerifyAuth(CONSTANT.ROLE.ADMIN), createMovieValidation, movieController.createMovie);
 
 /** read */
 router.get('/', VerifyAuth(), movieController.getAllMovies);

@@ -1,16 +1,24 @@
 
-export const queryDB = {
-    FindAll: async (modelName: any, attributes: any[]): Promise<any> => {
+export const db = {
+    FindAll: async (modelName: any, options: any): Promise<any> => {
         try {
-            const res = await modelName.findAll({ attributes: attributes.length > 0 ? attributes : [] });
+            const data = await modelName.findAll(options);
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    },
+    FindOne: async (modelName: any, options: any): Promise<any> => {
+        try {
+            const res = await modelName.findOne(options);
             return res;
         } catch (error) {
             throw error;
         }
     },
-    FindOne: async (modelName: any, filter: any): Promise<any> => {
+    FindByPrimaryKey: async (modelName: any, pk: any): Promise<any> => {
         try {
-            const res = await modelName.findOne(filter);
+            const res = await modelName.findByPk(pk);
             return res;
         } catch (error) {
             throw error;
@@ -24,13 +32,22 @@ export const queryDB = {
             throw error;
         }
     },
-    Update: async (modelName: any, data: any): Promise<any> => {
+    Update: async (modelInstance: any, data: any): Promise<any> => {
         try {
-            const res = await modelName.create(data);
+            modelInstance.set(data);
+            const res = await modelInstance.save();
             return res;
         } catch (error) {
             throw error;
         }
-    }
+    },
+    DeleteByPrimaryKey: async (modelName: any, options: any): Promise<any> => {
+        try {
+            await modelName.destroy(options)
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    },
 
 }
