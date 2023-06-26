@@ -71,7 +71,7 @@ export const analyticsController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     geProfitAnalytics: async (req: Request, res: Response) => {
@@ -140,7 +140,7 @@ export const analyticsController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     }
 }

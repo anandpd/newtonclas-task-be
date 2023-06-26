@@ -48,7 +48,7 @@ export const ticketController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     updateTicketByPK: async (req: Request, res: Response) => {
@@ -66,7 +66,7 @@ export const ticketController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     createTicket: async (req: Request, res: Response) => {
@@ -99,7 +99,7 @@ export const ticketController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     deleteTicketByPK: async (req: Request, res: Response) => {
@@ -114,7 +114,7 @@ export const ticketController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getTicketByPK: async (req: Request, res: Response) => {
@@ -157,7 +157,7 @@ export const ticketController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     }
 }

@@ -25,7 +25,7 @@ export const movieController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getMovieByPK: async (req: Request, res: Response) => {
@@ -38,7 +38,7 @@ export const movieController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     updateMovieByPK: async (req: Request, res: Response) => {
@@ -55,7 +55,7 @@ export const movieController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     deleteMovieByPK: async (req: Request, res: Response) => {
@@ -69,7 +69,7 @@ export const movieController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getAllMovies: async (req: Request, res: Response) => {
@@ -84,7 +84,7 @@ export const movieController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     }
 }
