@@ -48,7 +48,6 @@ API's for: Customer, Ticket, Movie and Analytics.
 ### Steps
 - Clone the repository.
 - npm install in the directory.
-- Make sure docker is installed.
 - Switch branch to ```master```.
 - Install Postgres
 - Run ```npm start```.
