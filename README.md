@@ -36,9 +36,9 @@ API's for: Customer, Ticket, Movie and Analytics.
 
 ### Steps
 - Clone the repository.
+- Switch branch to ```deploy/docker```
 - npm install in the directory.
 - Make sure docker is installed.
-- Switch branch to ```deploy/docker```
 - Run ```docker-compose up -d```.
 - or ```docker-compose up -d --build``` (*to force new build*).
 - Server should be running on specified port.
@@ -48,7 +48,6 @@ API's for: Customer, Ticket, Movie and Analytics.
 ### Steps
 - Clone the repository.
 - npm install in the directory.
-- Make sure docker is installed.
 - Switch branch to ```master```.
 - Install Postgres
 - Run ```npm start```.
