@@ -5,12 +5,12 @@ import logger from "../utils/logger";
 import { CONSTANT } from "../utils/constant";
 import { v4 as uuidv4 } from 'uuid';
 import { ITicketAttr } from "../models/Ticket";
-
+import * as service from '../services';
 
 export const ticketController = {
     getAllTickets: async (req: Request, res: Response) => {
         try {
-            const response = await Ticket.findAll({
+            const response = await service.db.FindAll(Ticket,{
                 where: {},
                 include: [
                     {
@@ -54,12 +54,9 @@ export const ticketController = {
     updateTicketByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const ticket = await Ticket.findByPk(id);
+            let ticket = await service.db.FindByPrimaryKey(Ticket, id);
             if (ticket == null) return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No ticket found with id ${id}`, success: true });
-            ticket.set({
-                ...req.body
-            });
-            await ticket.save();
+            ticket = await service.db.Update(Ticket, req.body);
             return HttpResponse(res, { data: { ...ticket.dataValues } })
         } catch (error: any) {
             logger.error(`Error in updateTicketByPK() = ${error}`)
@@ -84,14 +81,14 @@ export const ticketController = {
             if (req.body.createdAt) createTicketInstance.createdAt = req.body.createdAt;
 
             let preCheckPromise: Array<Promise<any>> = [
-                Customer.findByPk(createTicketInstance.customerId),
-                Movie.findByPk(createTicketInstance.movieId)
+                service.db.FindByPrimaryKey(Customer, createTicketInstance.customerId),
+                service.db.FindByPrimaryKey(Customer,createTicketInstance.movieId)
             ];
             preCheckPromise = await Promise.all(preCheckPromise);
             if (preCheckPromise[0] == null) return HttpResponse(res, { success: false, message: "Customer doesnt exists !" });
             else if (preCheckPromise[1] == null) return HttpResponse(res, { success: false, message: "Movie doesnt exists !" });
 
-            const dbRes = await Ticket.create(createTicketInstance);
+            const dbRes = await service.db.Create(Ticket, createTicketInstance);
             return HttpResponse(res, { data: dbRes, statusCode: CONSTANT.HTTP_STATUS.OK, message: `Ticket "${id}" created successfully !` })
 
         } catch (error: any) {
@@ -105,9 +102,13 @@ export const ticketController = {
     deleteTicketByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const ticket = await Ticket.findByPk(id);
+            const ticket = await service.db.FindByPrimaryKey(Ticket, id);
             if (ticket == null) return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No ticket found with id ${id}`, success: true });
-            await ticket.destroy();
+            await service.db.DeleteByPrimaryKey(Ticket, {
+                where: {
+                    ticketId: id
+                }
+            })
             return HttpResponse(res, { data: {} })
         } catch (error: any) {
             logger.error(`Error in deleteTicketByPK() = ${error}`)
@@ -120,37 +121,7 @@ export const ticketController = {
     getTicketByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const ticketByPk = await Ticket.findByPk(id, {
-                include: [
-                    {
-                        model: Customer,
-                        as: "customerDetails",
-                        attributes: [
-                            "customerId",
-                            "firstName",
-                            "lastName",
-                            "age",
-                            "sex"
-                        ]
-                    },
-                    {
-                        model: Movie,
-                        as: "movieDetails",
-                        attributes: [
-                            "movieId",
-                            "movieTitle",
-                            "movieTime"
-                        ]
-                    }
-                ],
-                attributes: [
-                    "ticketId",
-                    "price",
-                    "location",
-                    "seatNum",
-                    "addOns",
-                ]
-            });
+            const ticketByPk = await service.db.FindByPrimaryKey(Ticket, id);
             return HttpResponse(res, { data: ticketByPk });
         } catch (error: any) {
             logger.error(`Error in getTicketByPK() = ${error}`)

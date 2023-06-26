@@ -4,6 +4,7 @@ import { CONSTANT } from "../utils/constant";
 import { v4 as uuidv4 } from 'uuid';
 import { Customer } from '../models';
 import { ICustomerAttr } from "../models/Customer";
+import * as service from '../services'
 
 export const customerController = {
     createCustomer: async (req: Request, res: Response) => {
@@ -19,13 +20,9 @@ export const customerController = {
                 email: req.body.email
             }
             if (req.body.createdAt) customer.createdAt = req.body.createdAt;
-            const isExist = await Customer.findOne({
-                where: {
-                    email: customer.email
-                }
-            });
+            const isExist = await service.db.FindOne(Customer, {where: { email: customer.email } });
             if (isExist) return HttpResponse(res, {message: "Customer with this email already exists !"});
-            const dbRes = await Customer.create(customer);
+            const dbRes = await service.db.Create(Customer, customer);
             return HttpResponse(res, { data: dbRes, statusCode: CONSTANT.HTTP_STATUS.OK, message: "Customer created successfully !" })
 
         } catch (error: any) {
@@ -38,7 +35,7 @@ export const customerController = {
     getCustomerByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const customer = await Customer.findByPk(id);
+            const customer = await service.db.FindByPrimaryKey(Customer,id);
             if (customer == null)  return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
             return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, data: customer, success: true });
         } catch (error: any) {
@@ -51,14 +48,13 @@ export const customerController = {
     updateCustomerByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const customer = await Customer.findByPk(id);
-            if (customer == null) {
-                return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
-            }
-            customer.set({
-                ...req.body
-            });
-            await customer.save();
+            let customer = await service.db.FindByPrimaryKey(Customer,id);
+            if (customer == null)  return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
+            // customer.set({
+            //     ...req.body
+            // });
+            // await customer.save();
+            customer = await service.db.Update(customer, req.body);
             return HttpResponse(res, { data: { ...customer.dataValues } })
         } catch (error: any) {
             if (error.name == "SequelizeValidationError") {
@@ -70,7 +66,7 @@ export const customerController = {
     deleteCustomerByPK: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const customer = await Customer.findByPk(id);
+            const customer = await service.db.FindByPrimaryKey(Customer,id);
             if (customer == null) {
                 return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.OK, message: `No customer found with id ${id}`, success: true });
             }
