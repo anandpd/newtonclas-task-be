@@ -43,10 +43,12 @@ export const ticketController = {
                 ]
             });
             return HttpResponse(res, { data: response });
-        } catch (error) {
-            res.json({
-                error: error
-            })
+        } catch (error: any) {
+            logger.error(`Error in getAllTickets() = ${error}`)
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
+            }
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     updateTicketByPK: async (req: Request, res: Response) => {
@@ -60,11 +62,11 @@ export const ticketController = {
             await ticket.save();
             return HttpResponse(res, { data: { ...ticket.dataValues } })
         } catch (error: any) {
-            logger.error(`Error while creating movie = ${error}`)
+            logger.error(`Error in updateTicketByPK() = ${error}`)
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     createTicket: async (req: Request, res: Response) => {
@@ -86,18 +88,18 @@ export const ticketController = {
                 Movie.findByPk(createTicketInstance.movieId)
             ];
             preCheckPromise = await Promise.all(preCheckPromise);
-            if (preCheckPromise[0] == null) return HttpResponse(res, {success: false, message: "Customer doesnt exists !"});
-            else if (preCheckPromise[1] == null) return HttpResponse(res, {success: false, message: "Movie doesnt exists !"});
+            if (preCheckPromise[0] == null) return HttpResponse(res, { success: false, message: "Customer doesnt exists !" });
+            else if (preCheckPromise[1] == null) return HttpResponse(res, { success: false, message: "Movie doesnt exists !" });
 
             const dbRes = await Ticket.create(createTicketInstance);
             return HttpResponse(res, { data: dbRes, statusCode: CONSTANT.HTTP_STATUS.OK, message: `Ticket "${id}" created successfully !` })
 
         } catch (error: any) {
-            logger.error(`Error while creating movie = ${error}`)
+            logger.error(`Error in createTicket() = ${error}`)
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     deleteTicketByPK: async (req: Request, res: Response) => {
@@ -108,11 +110,11 @@ export const ticketController = {
             await ticket.destroy();
             return HttpResponse(res, { data: {} })
         } catch (error: any) {
-            logger.error(`Error while creating movie = ${error}`)
+            logger.error(`Error in deleteTicketByPK() = ${error}`)
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getTicketByPK: async (req: Request, res: Response) => {
@@ -150,10 +152,12 @@ export const ticketController = {
                 ]
             });
             return HttpResponse(res, { data: ticketByPk });
-        } catch (error) {
-            res.json({
-                error: error
-            })
+        } catch (error: any) {
+            logger.error(`Error in getTicketByPK() = ${error}`)
+            if (error.name == "SequelizeValidationError") {
+                error = `SequelizeValidationError: ${error.errors[0].message}`;
+            }
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     }
 }

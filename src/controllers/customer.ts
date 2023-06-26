@@ -32,7 +32,7 @@ export const customerController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getCustomerByPK: async (req: Request, res: Response) => {
@@ -45,7 +45,7 @@ export const customerController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     updateCustomerByPK: async (req: Request, res: Response) => {
@@ -64,7 +64,7 @@ export const customerController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     deleteCustomerByPK: async (req: Request, res: Response) => {
@@ -80,7 +80,7 @@ export const customerController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     },
     getAllCustomer: async (req: Request, res: Response) => {
@@ -95,7 +95,7 @@ export const customerController = {
             if (error.name == "SequelizeValidationError") {
                 error = `SequelizeValidationError: ${error.errors[0].message}`;
             }
-            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error, success: false })
+            return HttpResponse(res, { statusCode: CONSTANT.HTTP_STATUS.SERVER_ERROR, message: error.message, success: false })
         }
     }
 }
